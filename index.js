@@ -1,6 +1,7 @@
 const PORT = process.env.PORT || 8000;
 const express = require("express");
-const axios = require("axios");
+const request = require("request"); //build my own proxy to eliminate CORS error, use "npm install request"
+const axios = require("axios"); // see  https://medium.com/@dtkatz/3-ways-to-fix-the-cors-error-and-how-access-control-allow-origin-works-d97d55946d9
 const cheerio = require("cheerio");
 const res = require("express/lib/response");
 const app = express();
@@ -44,12 +45,17 @@ newspapers.forEach((newspaper) => {
 		});
 });
 
+app.use((req, res, next) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	next();
+});
+
 app.get("/", (req, res) => {
-	res.json("Welcome to my Pet News API");
+	request(res.json("Welcome to my Pet News API"));
 });
 
 app.get("/news", (req, res) => {
-	res.json(articles);
+	request(res.json(articles));
 });
 
 app.listen(PORT, () => console.log(`server running on PORT ${PORT}`));
